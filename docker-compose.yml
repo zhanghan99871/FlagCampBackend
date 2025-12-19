@@ -1,0 +1,16 @@
+services:
+
+
+  db:
+    image: postgres:15.2-alpine
+    environment:
+      POSTGRES_DB: tripplanner
+      POSTGRES_PASSWORD: secret
+    volumes:
+      - tripplanner-pg-local:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+
+volumes:
+  tripplanner-pg-local:

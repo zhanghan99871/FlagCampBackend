@@ -1,0 +1,23 @@
+spring:
+  jackson:
+    default-property-inclusion: non_null
+    property-naming-strategy: SNAKE_CASE
+  datasource:
+    url: jdbc:postgresql://${DATABASE_URL:localhost}:${DATABASE_PORT:5432}/tripplanner
+    username: ${DATABASE_USERNAME:postgres}
+    password: ${DATABASE_PASSWORD:secret}
+    driver-class-name: org.postgresql.Driver
+  sql:
+    init:
+      mode: ${INIT_DB:always}
+      schema-locations: "classpath:database-init.sql"
+  cache:
+    caffeine:
+      spec: expireAfterWrite=60s
+
+logging:
+  level:
+    org.apache.coyote.http11.Http11InputBuffer: TRACE
+    org.springframework.jdbc.datasource.init: DEBUG
+    org.springframework.jdbc.core: DEBUG
+
