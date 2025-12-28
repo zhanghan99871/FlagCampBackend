@@ -14,6 +14,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -42,26 +43,31 @@ class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            FilterChain filterChain
-    ) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain) throws ServletException, IOException {
 
-        String header = request.getHeader("Authorization");
+        System.out.println("JWT FILTER HIT: " + request.getMethod() + " " + request.getServletPath());
+        System.out.println("Auth header: " + request.getHeader("Authorization"));
 
-        if (header != null && header.startsWith("Bearer ")) {
-            String token = header.substring(7);
-            String username = jwtUtil.validateAndGetUsername(token);
+        try {
+            String header = request.getHeader("Authorization");
+            if (header != null && header.startsWith("Bearer ")) {
+                String token = header.substring(7);
+                String username = jwtUtil.validateAndGetUsername(token);
 
-            UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(
-                            username,
-                            null,
-                            List.of()
-                    );
+                var auth = new UsernamePasswordAuthenticationToken(
+                        username, null,
+                        List.of(new SimpleGrantedAuthority("ROLE_USER"))
+                );
+                SecurityContextHolder.getContext().setAuthentication(auth);
 
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+                System.out.println("Authenticated as: " + username);
+            } else {
+                System.out.println("No Bearer token");
+            }
+        } catch (Exception e) {
+            System.out.println("JWT invalid: " + e.getClass().getSimpleName() + " : " + e.getMessage());
         }
 
         filterChain.doFilter(request, response);
@@ -95,7 +101,12 @@ public class AppConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.GET, "/", "/index.html", "/*.json", "/*.png", "/static/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/login", "/logout", "/signup").permitAll()
+                        .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated()
+
+                )
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
