@@ -1,8 +1,7 @@
 package com.laioffer.tripplanner.controller;
 
 import com.laioffer.tripplanner.entity.UserEntity;
-import com.laioffer.tripplanner.model.LoginBody;
-import com.laioffer.tripplanner.model.RegisterBody;
+import com.laioffer.tripplanner.model.*;
 import com.laioffer.tripplanner.repository.UserRepository;
 import com.laioffer.tripplanner.service.UserService;
 import com.laioffer.tripplanner.util.JWTUtil;
@@ -12,8 +11,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.xml.crypto.Data;
+
+@RequestMapping("/auth")
 @RestController
 public class UserController {
 
@@ -31,8 +34,14 @@ public class UserController {
 
     @PostMapping("/signup")
     public ResponseEntity<?> register(@RequestBody RegisterBody request) {
-        userService.register(request.email(), request.password(), request.username());
-        return ResponseEntity.ok("User registered successfully");
+        String err = userService.register(request.email(), request.password(), request.username());
+        UserData userData = new UserData(request.email(), request.password(), request.username());
+        if(err != null) {
+            RegisterResponse r = new RegisterResponse(false, userData, err);
+            return ResponseEntity.badRequest().body(r);
+        }
+        RegisterResponse r = new RegisterResponse(true, userData, null);
+        return ResponseEntity.ok(r);
     }
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginBody request) {
@@ -48,7 +57,10 @@ public class UserController {
         }
 
         String token = jwtUtil.generateToken(user.getEmail());
+        UserData userData = new UserData(user.getPassword(), user.getEmail(), user.getUsername());
+        LoginResponse r = new LoginResponse(true, userData, token, null);
 
-        return ResponseEntity.ok(token);
+
+        return ResponseEntity.ok(r);
     }
 }

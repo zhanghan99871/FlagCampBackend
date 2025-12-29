@@ -17,11 +17,11 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public void register(String email, String password, String username) {
+    public String register(String email, String password, String username) {
         email = email.toLowerCase();
 
         if (userRepository.existsByEmail(email)) {
-            throw new RuntimeException("Username already exists");
+            return "Username already exists";
         }
 
         UserEntity user = new UserEntity();
@@ -30,5 +30,6 @@ public class UserService {
         user.setEmail(email);
 
         userRepository.save(user);
+        return null;
     }
 }
