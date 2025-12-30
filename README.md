@@ -9,5 +9,5 @@ to build the project, you may need to:
    `chmod +x gradlew`
    `./gradlew build`
    For Windows:
-   `gradlew.bat build`
+   `./gradlew.bat build`
 5. `./gradlew bootRun`
