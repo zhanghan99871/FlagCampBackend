@@ -35,7 +35,7 @@ public class UserController {
     @PostMapping("/signup")
     public ResponseEntity<?> register(@RequestBody RegisterBody request) {
         String err = userService.register(request.email(), request.password(), request.username());
-        UserData userData = new UserData(request.email(), request.password(), request.username());
+        UserData userData = new UserData(request.password(), request.email(), request.username());
         if(err != null) {
             RegisterResponse r = new RegisterResponse(false, userData, err);
             return ResponseEntity.badRequest().body(r);

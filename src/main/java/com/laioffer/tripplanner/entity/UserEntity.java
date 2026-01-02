@@ -1,6 +1,7 @@
 package com.laioffer.tripplanner.entity;
 import org.jspecify.annotations.Nullable;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 @Table(name = "users")
 public class UserEntity {
@@ -8,8 +9,10 @@ public class UserEntity {
     @Id
     private Long id;
 
+    @Column("display_name")
     private String username;
 
+    @Column("password_hash")
     private String password;
 
 //    email is true id
@@ -27,6 +30,8 @@ public class UserEntity {
         this.email = email;
     }
 
+    public void setId(Long id) {this.id = id;}
+
     public String getUsername() {
         return username;
     }
@@ -36,6 +41,6 @@ public class UserEntity {
     public String getEmail() {
         return email;
     }
-
+    public Long getId() {  return id;}
     // getters & setters
 }
