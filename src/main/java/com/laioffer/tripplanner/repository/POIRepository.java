@@ -24,5 +24,11 @@ public interface POIRepository extends ListCrudRepository<POIEntity, Long> {
     
     @Query("SELECT * FROM pois WHERE city_id = :cityId AND rating >= :minRating ORDER BY rating DESC LIMIT :limit")
     List<POIEntity> findByCityIdAndMinRating(Long cityId, java.math.BigDecimal minRating, Integer limit);
+    
+    @Query("SELECT * FROM pois WHERE city_id = :cityId AND type = :type AND rating >= :minRating AND name ILIKE '%' || :keyword || '%' ORDER BY rating DESC LIMIT :limit")
+    List<POIEntity> findByCityIdAndTypeAndMinRatingAndKeyword(Long cityId, String type, java.math.BigDecimal minRating, String keyword, Integer limit);
+    
+    @Query("SELECT * FROM pois WHERE city_id = :cityId AND rating >= :minRating AND name ILIKE '%' || :keyword || '%' ORDER BY rating DESC LIMIT :limit")
+    List<POIEntity> findByCityIdAndMinRatingAndKeyword(Long cityId, java.math.BigDecimal minRating, String keyword, Integer limit);
 }
 
