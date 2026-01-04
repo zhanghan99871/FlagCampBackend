@@ -25,13 +25,11 @@ public class ItineraryController {
         this.userRepository = userRepository;
     }
 
-
     private Long getCurrentUserId() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String email = (String) auth.getPrincipal();
         return userRepository.findByEmail(email).getId();
     }
-
 
     @PostMapping
     public ResponseEntity<CreateItineraryResponse> createItinerary(@RequestBody CreateItineraryRequest request) {
@@ -46,8 +44,8 @@ public class ItineraryController {
             );
 
             CreateItineraryData data = new CreateItineraryData(
-                    itinerary.getId(),
-                    itinerary.getCurrentVersionId()
+                    itinerary.id(),
+                    itinerary.currentVersionId()
             );
 
             CreateItineraryResponse response = new CreateItineraryResponse(true, data, null);
@@ -59,7 +57,6 @@ public class ItineraryController {
         }
     }
 
-
     @GetMapping
     public ResponseEntity<ItineraryListResponse> getMyItineraries() {
         try {
@@ -69,10 +66,10 @@ public class ItineraryController {
 
             List<ItineraryData> data = itineraries.stream()
                     .map(it -> new ItineraryData(
-                            it.getId(),
-                            it.getTitle(),
-                            it.getDurationDays(),
-                            it.getCityId()
+                            it.id(),
+                            it.title(),
+                            it.durationDays(),
+                            it.cityId()
                     ))
                     .collect(Collectors.toList());
 
@@ -84,7 +81,6 @@ public class ItineraryController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
-
 
     @PutMapping("/{id}/duration")
     public ResponseEntity<UpdateDurationResponse> updateDuration(
